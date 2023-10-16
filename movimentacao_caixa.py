@@ -20,8 +20,7 @@ def tipooperacao_str(nr_operacao):
     operacao_caixa = {
         1: 'Aplicação',
         2: 'Resgate Parcial',
-        5: 'Resgate Total',
-    }
+        5: 'Resgate Total',    }
     operation_type = operacao_caixa.get(nr_operacao)
     return operation_type
 
@@ -57,31 +56,48 @@ arquivo.save(caminho_novo_arquivo)
 
 print(tipooperacao_str(tipo_operacao))
 
+smtp_server = os.getenv('SMTP_SERVER')
+smtp_port = os.getenv('SMTP_PORT')
+remetente_email = os.getenv('REMETENTE_EMAIL')
+remetente_senha = os.getenv('REMETENTE_SENHA')
+destinatarios = ['gabriel@cartor.com.br']
+msg = MIMEMultipart()
+msg['From'] = remetente_email
+msg['To'] = ', '.join(destinatarios)
+msg['Subject'] = tipooperacao_str(tipo_operacao)+' - Vanguard II - fundo Soberano Santander'
 
-# smtp_server = 'smtp.gmail.com'
-# smtp_port = 587
-# remetente_email = 'gassuncao27@gmail.com'
-# remetente_senha = 'prbodrwvszovzips'
-# destinatarios = ['gabriel@cartor.com.br']
-# msg = MIMEMultipart()
-# msg['From'] = remetente_email
-# msg['To'] = ', '.join(destinatarios)
-# msg['Subject'] = tipooperacao_str(tipo_operacao)+' - Vanguard II - fundo Soberano Santander'
+nome_arquivo = caminho_novo_arquivo
+parte_anexada = MIMEBase('application', 'octet-stream')
+parte_anexada.set_payload(open(nome_arquivo, 'rb').read())
+encoders.encode_base64(parte_anexada)
+parte_anexada.add_header('Content-Disposition', 'attachment', filename=nome_arquivo.split('/')[-1])
+msg.attach(parte_anexada)
 
-# nome_arquivo = caminho_novo_arquivo
-# parte_anexada = MIMEBase('application', 'octet-stream')
-# parte_anexada.set_payload(open(nome_arquivo, 'rb').read())
-# encoders.encode_base64(parte_anexada)
-# parte_anexada.add_header('Content-Disposition', 'attachment', filename=nome_arquivo.split('/')[-1])
-# msg.attach(parte_anexada)
+if datetime.now().hour < 12:
+    if tipo_operacao == 1:
+        corpo_email = 'Bom dia!\nFavor realizar a aplicação em anexo.\nObrigado,\n\nGabriel Assunção\n(031)99276-0244' 
+    elif tipo_operacao == 2 or tipo_operacao == 5:
+        corpo_email = 'Bom dia!\nFavor realizar o resgate em anexo.\nObrigado,\n\nGabriel Assunção\n(031)99276-0244' 
+    else:
+        print('ERROR - no envio do tipo de operação')
+        sys.exit()
+
+
+else:
+    if tipo_operacao == 1:
+        corpo_email = 'Boa tarde!\nFavor realizar a aplicação em anexo.\nObrigado,\n\nGabriel Assunção\n(031)99276-0244' 
+    elif tipo_operacao == 2 or tipo_operacao == 5:
+        corpo_email = 'Boa tarde!\nFavor realizar o resgate em anexo.\nObrigado,\n\nGabriel Assunção\n(031)99276-0244'
+    else:
+        print('ERROR - no envio do tipo de operação')
+        sys.exit()        
+
+print(corpo_email)
+# msg.attach(MIMEText(corpo_email, 'plain'))
 
 # server = smtplib.SMTP(smtp_server, smtp_port)
 # server.starttls()
 # server.login(remetente_email, remetente_senha)
 # server.sendmail(remetente_email, destinatarios, msg.as_string())
-
-
-# celulas mexer = 5,2 - 5,6 - 5,8
-# modelo de data = 10/10/23
-# modelo de numero = 203.000,00
 # tipo de operação = 1:Aplicaçãp., 2:Resgate Parcial, 5: Resgate Total
+
