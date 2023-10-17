@@ -1,6 +1,5 @@
 # script para movimentar caixa aplicações Santander
 # caminho para o arquivo no sistema + abrir o arquivo em excel
-
 from dotenv import load_dotenv
 from datetime import datetime
 
@@ -27,7 +26,7 @@ def tipooperacao_str(nr_operacao):
 data_atual = datetime.now()
 data_formatada = data_atual.strftime('%d/%m/%y')
 tipo_operacao = int(input("\nTipo de Operação: "))
-valor_operacao = float(input("Valor da Operação: "))
+valor_operacao = float(input("Valor da Operação: ").replace(',', '.'))
 
 if tipooperacao_str(tipo_operacao) is None:
     print('Tipo de Operação não existente. Favor Verificar!\n')
@@ -60,16 +59,15 @@ smtp_server = os.getenv('SMTP_SERVER')
 smtp_port = os.getenv('SMTP_PORT')
 remetente_email = os.getenv('REMETENTE_EMAIL')
 remetente_senha = os.getenv('REMETENTE_SENHA')
-destinatarios = ['gabriel@cartor.com.br']
-# destinatarios = ['contmova@santander.com.br', 'assetatacado@santanderam.com']
-emails_cc = ['gabriel@abstratinvest.com']
-# emails_cc = ['gabriel@cartor.com.br', 'allan@liminedtvm.com.br', 'gabriel@liminedtvm.com.br', 'custodia@liminedtvm.com.br']
-# enviar para: 
+destinatarios = [os.getenv('REMETENTE_EMAIL'), os.getenv('EMAIL_TEST')]
+emails_cc = [os.getenv('EMAIL_TEST')]
+
 
 msg = MIMEMultipart()
 msg['From'] = remetente_email
 msg['To'] = ', '.join(destinatarios)
 msg['Subject'] = tipooperacao_str(tipo_operacao)+' - Vanguard II - fundo Soberano Santander'
+msg['Cc'] = ', '.join(emails_cc)
 
 nome_arquivo = caminho_novo_arquivo
 parte_anexada = MIMEBase('application', 'octet-stream')
@@ -97,9 +95,9 @@ else:
 
 msg.attach(MIMEText(corpo_email, 'plain'))
 
+todos_destinatarios = destinatarios + emails_cc
 server = smtplib.SMTP(smtp_server, smtp_port)
 server.starttls()
 server.login(remetente_email, remetente_senha)
-server.sendmail(remetente_email, destinatarios, msg.as_string())
+server.sendmail(remetente_email, todos_destinatarios, msg.as_string())
 # tipo de operação = 1:Aplicaçãp., 2:Resgate Parcial, 5: Resgate Total
-

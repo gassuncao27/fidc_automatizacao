@@ -37,13 +37,14 @@ def enviar_email(tipo_operacao, caminho_novo_arquivo):
     smtp_port = os.getenv('SMTP_PORT')
     remetente_email = os.getenv('REMETENTE_EMAIL')
     remetente_senha = os.getenv('REMETENTE_SENHA')
-    destinatarios = ['gabriel@cartor.com.br']
-    emails_cc = ['gabriel@abstratinvest.com']
+    destinatarios = [os.getenv('EMAIL_RECIPIENT'), os.getenv('EMAIL_RECIPIENT2')]
+    emails_cc = [os.getenv('EMAIL_COPY1'), os.getenv('EMAIL_COPY2'), os.getenv('EMAIL_COPY3')]
 
     msg = MIMEMultipart()
     msg['From'] = remetente_email
     msg['To'] = ', '.join(destinatarios)
     msg['Subject'] = f"{tipooperacao_str(tipo_operacao)} - Vanguard II - fundo Soberano Santander"
+    msg['Cc'] = ', '.join(emails_cc)
 
     with open(caminho_novo_arquivo, 'rb') as arquivo:
         parte_anexada = MIMEBase('application', 'octet-stream')
@@ -57,14 +58,14 @@ def enviar_email(tipo_operacao, caminho_novo_arquivo):
     with smtplib.SMTP(smtp_server, smtp_port) as server:
         server.starttls()
         server.login(remetente_email, remetente_senha)
-        server.sendmail(remetente_email, destinatarios, msg.as_string())
+        server.sendmail(remetente_email, destinatarios+emails_cc, msg.as_string())
 
 
 def main():
     data_atual = datetime.now()
     data_formatada = data_atual.strftime('%d/%m/%y')
     tipo_operacao = int(input("\nTipo de Operação: "))
-    valor_operacao = float(input("Valor da Operação: "))
+    valor_operacao = float(input("Valor da Operação: ").replace(',', '.'))
     print('')
 
     if tipooperacao_str(tipo_operacao) is None:
