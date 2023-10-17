@@ -61,6 +61,11 @@ smtp_port = os.getenv('SMTP_PORT')
 remetente_email = os.getenv('REMETENTE_EMAIL')
 remetente_senha = os.getenv('REMETENTE_SENHA')
 destinatarios = ['gabriel@cartor.com.br']
+# destinatarios = ['contmova@santander.com.br', 'assetatacado@santanderam.com']
+emails_cc = ['gabriel@abstratinvest.com']
+# emails_cc = ['gabriel@cartor.com.br', 'allan@liminedtvm.com.br', 'gabriel@liminedtvm.com.br', 'custodia@liminedtvm.com.br']
+# enviar para: 
+
 msg = MIMEMultipart()
 msg['From'] = remetente_email
 msg['To'] = ', '.join(destinatarios)
@@ -81,8 +86,6 @@ if datetime.now().hour < 12:
     else:
         print('ERROR - no envio do tipo de operação')
         sys.exit()
-
-
 else:
     if tipo_operacao == 1:
         corpo_email = 'Boa tarde!\nFavor realizar a aplicação em anexo.\nObrigado,\n\nGabriel Assunção\n(031)99276-0244' 
@@ -92,12 +95,11 @@ else:
         print('ERROR - no envio do tipo de operação')
         sys.exit()        
 
-print(corpo_email)
-# msg.attach(MIMEText(corpo_email, 'plain'))
+msg.attach(MIMEText(corpo_email, 'plain'))
 
-# server = smtplib.SMTP(smtp_server, smtp_port)
-# server.starttls()
-# server.login(remetente_email, remetente_senha)
-# server.sendmail(remetente_email, destinatarios, msg.as_string())
+server = smtplib.SMTP(smtp_server, smtp_port)
+server.starttls()
+server.login(remetente_email, remetente_senha)
+server.sendmail(remetente_email, destinatarios, msg.as_string())
 # tipo de operação = 1:Aplicaçãp., 2:Resgate Parcial, 5: Resgate Total
 
