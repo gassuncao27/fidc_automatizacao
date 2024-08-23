@@ -38,7 +38,7 @@ def enviar_email(tipo_operacao, caminho_novo_arquivo):
     remetente_email = os.getenv('REMETENTE_EMAIL')
     remetente_senha = os.getenv('REMETENTE_SENHA')
     destinatarios = [os.getenv('EMAIL_RECIPIENT'), os.getenv('EMAIL_RECIPIENT2')]
-    emails_cc = [os.getenv('EMAIL_COPY1'), os.getenv('EMAIL_COPY2'), os.getenv('EMAIL_COPY3')]
+    emails_cc = [os.getenv('EMAIL_COPY1')]
 
     msg = MIMEMultipart()
     msg['From'] = remetente_email
